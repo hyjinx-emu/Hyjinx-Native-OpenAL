@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Hyjinx.Audio.OpenAL.Dependencies</id>
+    <version>1.21.0.1</version>
+    <description>This package contains Hyjinx.Audio dependencies to be used by Hyjinx on Windows.</description>
+    <authors>Thog</authors>
+    <license type="expression">LGPL-2.0-only</license>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <contentFiles>
+      <files include="cs\netstandard2.0\**" copyToOutput="true" buildAction="None" flatten="false"/>
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="deps\**" target="contentFiles\cs\netstandard2.0\" />
+  </files>
+</package>
