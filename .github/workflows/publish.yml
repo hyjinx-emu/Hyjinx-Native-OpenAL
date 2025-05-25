@@ -1,0 +1,31 @@
+name: publish
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install NuGet CLI via Chocolatey
+        run: choco install nuget.commandline -y
+
+      - name: Add NuGet to PATH
+        run: |
+          $nugetPath = "${env:ChocolateyInstall}\bin"
+          echo "$nugetPath" | Out-File -Append -Encoding ascii $env:GITHUB_PATH
+
+      - name: Create package
+        run: |
+          nuget pack src/Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: ./out/*.nupkg
