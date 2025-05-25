@@ -32,8 +32,9 @@ jobs:
           name: artifacts
           path: ./out/*.nupkg
 
-  upload:
+  publish:
     runs-on: windows-latest
+    needs: package
 
     steps:
       - name: Download artifacts
