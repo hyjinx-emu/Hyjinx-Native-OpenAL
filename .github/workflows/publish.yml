@@ -25,7 +25,7 @@ jobs:
       - name: Create package
         shell: powershell
         run: |
-          nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out -Suffix "preview.${{ github.run-number }}"
+          nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out -Suffix "preview.${GITHUB_RUN_NUMBER}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
