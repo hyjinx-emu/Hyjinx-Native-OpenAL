@@ -7,11 +7,8 @@
     <authors>Thog</authors>
     <license type="expression">LGPL-2.0-only</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <contentFiles>
-      <files include="cs\netstandard2.0\**" copyToOutput="true" buildAction="None" flatten="false"/>
-    </contentFiles>
   </metadata>
   <files>
-    <file src="libs\win-x64\**" target="runtimes\win-x64\lib\net9.0\" />
+    <file src="runtimes\**" target="runtimes" />
   </files>
 </package>
