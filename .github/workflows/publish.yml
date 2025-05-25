@@ -49,4 +49,8 @@ jobs:
 
       - name: Push package(s)
         shell: powershell
-        run: nuget push dist/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey "${{ secrets.NUGET_TOKEN }}"
+        run: |
+          Get-ChildItem -Path "dist" -Filter *.nupkg | ForEach-Object {
+            Write-Host "Pushing $($_.FullName)"
+            nuget push $_.FullName -Source https://api.nuget.org/v3/index.json -ApiKey "${{ secrets.NUGET_TOKEN }}"
+          }
