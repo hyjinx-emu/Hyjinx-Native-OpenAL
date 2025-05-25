@@ -43,6 +43,10 @@ jobs:
           path: dist/
           merge-multiple: true
 
+      - name: Echo dist/
+        shell: powershell
+        run: Get-ChildItem -Path "dist/" -Recurse -File | Select-Object -ExpandProperty FullName
+
       - name: Push package(s)
         shell: powershell
         run: nuget push dist/*.nupkg -Source https://api.nuget.org/v3/index.json -ApiKey "${{ secrets.NUGET_TOKEN }}"
