@@ -1,0 +1,61 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types: [ published ]
+
+jobs:
+  package:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install NuGet CLI via Chocolatey
+        shell: powershell
+        run: choco install nuget.commandline -y
+
+      - name: Add NuGet to PATH
+        shell: powershell
+        run: |
+          $nugetPath = "${env:ChocolateyInstall}\bin"
+          echo "$nugetPath" | Out-File -Append -Encoding ascii $env:GITHUB_PATH
+
+      - name: Package preview
+        if: github.event.action != 'published'
+        shell: powershell
+        run: nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out -Suffix "preview.${{ github.run_number }}"
+
+      - name: Package release
+        if: github.event.action == 'published'
+        shell: powershell
+        run: nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: ./out/*.nupkg
+
+  publish:
+    runs-on: windows-latest
+    needs: package
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+          merge-multiple: true
+
+      - name: Push package(s)
+        shell: powershell
+        run: |
+          Get-ChildItem -Path "dist" -Filter *.nupkg | ForEach-Object {
+            Write-Host "Pushing $($_.FullName)"
+            nuget push $_.FullName -Source https://api.nuget.org/v3/index.json -ApiKey "${{ secrets.NUGET_TOKEN }}"
+          }
