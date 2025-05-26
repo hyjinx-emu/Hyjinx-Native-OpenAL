@@ -5,7 +5,7 @@
     <version>1.21.0</version>
     <description>This package contains Hyjinx.Audio dependencies to be used by Hyjinx on Windows.</description>
     <authors>Thog</authors>
-    <license type="expression">LGPL-2.1</license>
+    <license type="expression">LGPL-2.1-only</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
   </metadata>
   <files>
