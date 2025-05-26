@@ -2,7 +2,8 @@ name: publish
 
 on:
   push:
-  workflow_dispatch:
+  release:
+    types: [ published ]
 
 jobs:
   package:
@@ -22,9 +23,15 @@ jobs:
           $nugetPath = "${env:ChocolateyInstall}\bin"
           echo "$nugetPath" | Out-File -Append -Encoding ascii $env:GITHUB_PATH
 
-      - name: Create package
+      - name: Package preview
+        if: github.event.action != 'published'
         shell: powershell
         run: nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out -Suffix "preview.${{ github.run_number }}"
+
+      - name: Package release
+        if: github.event.action == 'published'
+        shell: powershell
+        run: nuget pack Hyjinx.Audio.OpenAL.Dependencies.nuspec -OutputDirectory ./out
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -42,10 +49,6 @@ jobs:
         with:
           path: dist/
           merge-multiple: true
-
-      - name: Echo dist/
-        shell: powershell
-        run: Get-ChildItem -Path "dist/" -Recurse -File | Select-Object -ExpandProperty FullName
 
       - name: Push package(s)
         shell: powershell
