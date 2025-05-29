@@ -89,6 +89,12 @@ jobs:
         shell: bash
         run: cp -r "out/bin/"* "dist/runtimes/${{ matrix.platform.name }}/native"
 
+      - name: Upload out artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "out-${{ matrix.platform.name }}"
+          path: "out/"
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
