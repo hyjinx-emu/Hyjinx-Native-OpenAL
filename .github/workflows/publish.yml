@@ -135,7 +135,6 @@ jobs:
   publish:
     runs-on: windows-latest
     needs: package
-    if: true == false
 
     steps:
       - name: Download artifacts
