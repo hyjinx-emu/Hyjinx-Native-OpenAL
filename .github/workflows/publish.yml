@@ -63,7 +63,6 @@ jobs:
       #     sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 
       - name: Create temp folder
-        shell: ${{ matrix.platform.shell }}
         run: mkdir ${{ env.BUILD_DIR }}
 
       - name: Configure
@@ -94,11 +93,9 @@ jobs:
       #     -DBUILD_TESTING=OFF
 
       - name: Build
-        shell: ${{ matrix.platform.shell }}
         run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
 
       - name: Install
-        shell: ${{ matrix.platform.shell }}
         run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "$GITHUB_WORKSPACE/out"
 
       - name: Upload build artifacts
