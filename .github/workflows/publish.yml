@@ -5,6 +5,13 @@ on:
   release:
     types: [ published ]
 
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  OPENAL_VERSION: 1.21.0 # This needs to be updated to match the OpenAL version being compiled.
+
 jobs:
   package:
     runs-on: windows-latest
@@ -22,12 +29,12 @@ jobs:
       - name: Package preview
         if: github.event.action != 'published'
         shell: powershell
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Suffix "preview.${{ github.run_number }}"
+        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ env.OPENAL_VERSION }}" -Suffix "preview.${{ github.run_number }}"
 
       - name: Package release
         if: github.event.action == 'published'
         shell: powershell
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out
+        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ env.OPENAL_VERSION }}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
