@@ -3,7 +3,7 @@
   <metadata>
     <id>Hyjinx.OpenAL.native</id>
     <version>1.21.0</version>
-    <description>This package contains OpenAL dependencies to be used by the Hyjinx emulator.</description>
+    <description>This package contains native OpenAL dependencies to be used by the Hyjinx emulator.</description>
     <authors>hyjinx-emu</authors>
     <license type="file">LICENSE.txt</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
