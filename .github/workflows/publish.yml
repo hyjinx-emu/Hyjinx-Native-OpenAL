@@ -57,14 +57,14 @@ jobs:
           sudo apt update
           sudo apt install -y cmake mingw-w64 make
 
-      - name: Create build folder
+      - name: Create temp folder
         shell: bash
-        run: mkdir build
+        run: mkdir temp
 
       - name: Configure OpenAL (Windows)
         if: matrix.platform.name == 'win-x64'
         shell: bash
-        run: cmake -S . -B "build/" \
+        run: cmake -S . -B "temp/" \
           -DCMAKE_SYSTEM_NAME=Windows \
           -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
           -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
@@ -78,7 +78,7 @@ jobs:
 
       - name: Build and Install
         shell: bash
-        run: cmake --build "build/" --target install --parallel
+        run: cmake --build "temp/" --target install --parallel
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
