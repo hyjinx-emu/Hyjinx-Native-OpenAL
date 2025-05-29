@@ -54,14 +54,6 @@ jobs:
           repository: kcat/openal-soft
           ref: ${{ env.OPENAL_VERSION }}
 
-      # - name: Install dependencies (Windows)
-      #   if: matrix.platform.name == 'win-x64'
-      #   run: |
-      #     sudo apt update
-      #     sudo apt install -y cmake make ninja-build g++-mingw-w64-x86-64-posix
-      #     sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-      #     sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
-
       - name: Create temp folder
         run: mkdir ${{ env.BUILD_DIR }}
 
@@ -77,23 +69,8 @@ jobs:
           -DALSOFT_TESTS=OFF `
           -DBUILD_TESTING=OFF
 
-      # - name: Configure OpenAL (Windows)
-      #   if: matrix.platform.name == 'win-x64'
-      #   shell: bash
-      #   run: cmake -S . -B "${{ env.BUILD_DIR }}/" \
-      #     -DCMAKE_SYSTEM_NAME=Windows \
-      #     -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
-      #     -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
-      #     -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
-      #     -DCMAKE_CXX_STANDARD=17 \
-      #     -DLIBTYPE=SHARED \
-      #     -DALSOFT_NO_CONFIG_UTIL=ON \
-      #     -DALSOFT_EXAMPLES=OFF \
-      #     -DALSOFT_TESTS=OFF \
-      #     -DBUILD_TESTING=OFF
-
       - name: Build
-        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
+        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --target install --parallel
 
       - name: Install
         run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "out"
