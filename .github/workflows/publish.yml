@@ -58,7 +58,9 @@ jobs:
         if: matrix.platform.name == 'win-x64'
         run: |
           sudo apt update
-          sudo apt install -y cmake mingw-w64 make
+          sudo apt install -y cmake make ninja-build g++-mingw-w64-x86-64-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 
       - name: Create temp folder
         shell: bash
@@ -72,6 +74,7 @@ jobs:
           -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
           -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
           -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
+          -DCMAKE_CXX_STANDARD=17 \
           -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/out" \
           -DLIBTYPE=SHARED \
           -DALSOFT_NO_CONFIG_UTIL=ON \
