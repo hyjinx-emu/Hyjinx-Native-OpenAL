@@ -5,14 +5,13 @@
     <version>1.21.0</version>
     <description>This package contains native OpenAL dependencies to be used by the Hyjinx emulator.</description>
     <authors>hyjinx-emu</authors>
-    <license type="file">LICENSE.txt</license>
+    <license type="expression">LGPL-2.1-only</license>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <projectUrl>https://github.com/hyjinx-emu/Hyjinx-Native-OpenAL</projectUrl>
     <repository type="git" url="https://github.com/hyjinx-emu/Hyjinx-Native-OpenAL.git" />
   </metadata>
   <files>
     <file src="README.md" target="" />
-    <file src="LICENSE.txt" target="" />
     <!-- Native binaries -->
     <file src="runtimes\**" target="runtimes" />
   </files>
