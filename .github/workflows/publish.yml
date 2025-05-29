@@ -81,7 +81,7 @@ jobs:
           -DALSOFT_TESTS=OFF \
           -DBUILD_TESTING=OFF
 
-      - name: Build and Install
+      - name: Build
         shell: bash
         run: cmake --build "${{ env.BUILD_DIR }}/" --parallel
 
