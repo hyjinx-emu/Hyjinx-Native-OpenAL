@@ -12,7 +12,6 @@
   </metadata>
   <files>
     <file src="README.md" target="" />
-    <!-- Native binaries -->
-    <file src="runtimes\**" target="runtimes" />
+    <file src="dist\runtimes\**" target="runtimes" />
   </files>
 </package>

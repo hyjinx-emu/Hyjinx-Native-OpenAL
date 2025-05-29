@@ -35,7 +35,7 @@ jobs:
 
   build-native:
     name: build (${{ matrix.platform.name }})
-    runs-on: ${{ matrix.platform.runner }}
+    runs-on: ${{ matrix.platform.runner }}-latest
     needs: prepare
 
     env:
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: win-x64, runner: windows-latest }
+          - { name: win-x64, runner: windows }
       fail-fast: false
       
     steps:
@@ -55,38 +55,43 @@ jobs:
           ref: ${{ env.OPENAL_VERSION }}
 
       - name: Create temp folder
+        shell: bash
         run: mkdir ${{ env.BUILD_DIR }}
 
       - name: Configure
-        if: matrix.platform.name == 'win-x64'
-        shell: pwsh
-        run: cmake -S . -B "${{ env.BUILD_DIR }}" `
-          -G "Visual Studio 17 2022" `
-          -A x64 `
-          -DLIBTYPE=SHARED `
-          -DALSOFT_NO_CONFIG_UTIL=ON `
-          -DALSOFT_UTILS=OFF `
-          -DALSOFT_EXAMPLES=OFF `
-          -DALSOFT_TESTS=OFF `
+        if: matrix.platform.runner == 'windows'
+        shell: bash
+        run: cmake -S . -B "${{ env.BUILD_DIR }}" \
+          -G "Visual Studio 17 2022" \
+          -A x64 \
+          -DLIBTYPE=SHARED \
+          -DALSOFT_NO_CONFIG_UTIL=ON \
+          -DALSOFT_UTILS=OFF \
+          -DALSOFT_EXAMPLES=OFF \
+          -DALSOFT_TESTS=OFF \
           -DBUILD_TESTING=OFF
 
       - name: Build
+        shell: bash
         run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
 
       - name: Install
+        shell: bash
         run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "out"
+
+      - name: Create dist directory build artifacts
+        shell: bash
+        run: mkdir -p "dist/runtimes/${{ matrix.platform.name }}/native"
+
+      - name: Stage build artifacts
+        shell: bash
+        run: cp -r "${{ env.BUILD_DIR }}/bin/"* "dist/runtimes/${{ matrix.platform.name }}/native"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "build-${{ matrix.platform.name }}"
-          path: "${{ env.BUILD_DIR }}/"
-
-      - name: Upload output artifacts
-        uses: actions/upload-artifact@v4
-        with:
           name: "native-${{ matrix.platform.name }}"
-          path: "out/"
+          path: "dist/"
   
   package:
     runs-on: windows-latest
@@ -96,6 +101,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+          merge-multiple: true
+
       - name: Set up NuGet
         uses: nuget/setup-nuget@v2
         with:
@@ -104,12 +115,12 @@ jobs:
 
       - name: Package preview
         if: github.event.action != 'published'
-        shell: powershell
+        shell: pwsh
         run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "${{ needs.prepare.outputs.version_suffix }}"
 
       - name: Package release
         if: github.event.action == 'published'
-        shell: powershell
+        shell: pwsh
         run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}"
 
       - name: Upload artifacts
@@ -121,6 +132,7 @@ jobs:
   publish:
     runs-on: windows-latest
     needs: package
+    if: true == false
 
     steps:
       - name: Download artifacts
