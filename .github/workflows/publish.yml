@@ -85,7 +85,7 @@ jobs:
 
       - name: Stage build artifacts
         shell: bash
-        run: cp -r "${{ env.BUILD_DIR }}/bin/"* "dist/runtimes/${{ matrix.platform.name }}/native"
+        run: cp -r "out/bin/"* "dist/runtimes/${{ matrix.platform.name }}/native"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
