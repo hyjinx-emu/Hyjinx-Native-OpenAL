@@ -75,7 +75,6 @@ jobs:
           -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
           -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
           -DCMAKE_CXX_STANDARD=17 \
-          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/out" \
           -DLIBTYPE=SHARED \
           -DALSOFT_NO_CONFIG_UTIL=ON \
           -DALSOFT_EXAMPLES=OFF \
@@ -84,7 +83,11 @@ jobs:
 
       - name: Build and Install
         shell: bash
-        run: cmake --build "${{ env.BUILD_DIR }}/" --target install --parallel
+        run: cmake --build "${{ env.BUILD_DIR }}/" --parallel
+
+      - name: Install
+        shell: bash
+        run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "$GITHUB_WORKSPACE/out"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
