@@ -85,15 +85,10 @@ jobs:
         shell: bash
         run: mkdir -p "dist/runtimes/${{ matrix.platform.name }}/native"
 
-      - name: Stage build artifacts
+      - name: Stage artifacts (Windows)
+        if: matrix.platform.name == 'win-x64'
         shell: bash
-        run: cp -r "out/bin/"* "dist/runtimes/${{ matrix.platform.name }}/native"
-
-      - name: Upload out artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: "out-${{ matrix.platform.name }}"
-          path: "out/"
+        run: cp -r "out/bin/"OpenAL32.dll "dist/runtimes/${{ matrix.platform.name }}/native"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
