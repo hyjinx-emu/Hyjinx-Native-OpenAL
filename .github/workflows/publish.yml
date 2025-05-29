@@ -57,5 +57,5 @@ jobs:
         run: |
           Get-ChildItem -Path "dist" -Filter *.nupkg | ForEach-Object {
             Write-Host "Pushing $($_.FullName)"
-            nuget push $_.FullName
+            nuget push $_.FullName -Source https://api.nuget.org/v3/index.json
           }
