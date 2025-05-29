@@ -65,12 +65,13 @@ jobs:
           -A x64 `
           -DLIBTYPE=SHARED `
           -DALSOFT_NO_CONFIG_UTIL=ON `
+          -DALSOFT_UTILS=OFF `
           -DALSOFT_EXAMPLES=OFF `
           -DALSOFT_TESTS=OFF `
           -DBUILD_TESTING=OFF
 
       - name: Build
-        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --target install --parallel
+        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
 
       - name: Install
         run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "out"
