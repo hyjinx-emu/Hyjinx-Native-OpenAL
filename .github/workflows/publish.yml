@@ -32,10 +32,63 @@ jobs:
         id: set_version_suffix
         shell: bash
         run: echo "version_suffix=preview.${{ github.run_number }}" >> $GITHUB_OUTPUT
+
+  build-native:
+    name: build (${{ matrix.platform.name }})
+    runs-on: ${{ matrix.platform.os }}
+    needs: prepare
+
+    strategy:
+      matrix:
+        platform:
+          - { name: win-x64, os: ubuntu-latest, toolchain: x86_64-w64-mingw32 }
+      fail-fast: false
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: kcat/openal-soft
+          ref: ${{ env.OPENAL_VERSION }}
+
+      - name: Install dependencies (Windows)
+        if: matrix.platform.name == 'win-x64'
+        run: |
+          sudo apt update
+          sudo apt install -y cmake mingw-w64 make
+
+      - name: Create build folder
+        shell: bash
+        run: mkdir build
+
+      - name: Configure OpenAL (Windows)
+        if: matrix.platform.name == 'win-x64'
+        shell: bash
+        run: cmake -S . -B "build/" \
+          -DCMAKE_SYSTEM_NAME=Windows \
+          -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
+          -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
+          -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
+          -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/out" \
+          -DLIBTYPE=SHARED \
+          -DALSOFT_NO_CONFIG_UTIL=ON \
+          -DALSOFT_EXAMPLES=OFF \
+          -DALSOFT_TESTS=OFF \
+          -DBUILD_TESTING=OFF
+
+      - name: Build and Install
+        shell: bash
+        run: cmake --build "build/" --target install --parallel
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "native-${{ matrix.platform.name }}"
+          path: "out/"
   
   package:
     runs-on: windows-latest
-    needs: prepare
+    needs: [ prepare, build-native ]
 
     steps:
       - name: Checkout repository
