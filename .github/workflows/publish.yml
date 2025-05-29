@@ -50,7 +50,7 @@ jobs:
       - name: Package preview
         if: github.event.action != 'published'
         shell: powershell
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "preview.${{ needs.prepare.outputs.version_suffix }}"
+        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "${{ needs.prepare.outputs.version_suffix }}"
 
       - name: Package release
         if: github.event.action == 'published'
