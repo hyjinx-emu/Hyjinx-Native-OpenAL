@@ -31,7 +31,7 @@ jobs:
         if: github.event.action != 'published'
         id: set_version_suffix
         shell: bash
-        run: echo "version_suffix=${{ github.run_number }}" >> $GITHUB_OUTPUT
+        run: echo "version_suffix=preview.${{ github.run_number }}" >> $GITHUB_OUTPUT
   
   package:
     runs-on: windows-latest
@@ -50,12 +50,12 @@ jobs:
       - name: Package preview
         if: github.event.action != 'published'
         shell: powershell
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ env.OPENAL_VERSION }}" -Suffix "preview.${{ github.run_number }}"
+        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "preview.${{ needs.prepare.outputs.version_suffix }}"
 
       - name: Package release
         if: github.event.action == 'published'
         shell: powershell
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ env.OPENAL_VERSION }}"
+        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
