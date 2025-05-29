@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 env:
-  OPENAL_VERSION: 1.21.1 # This needs to be updated to match the OpenAL version being compiled.
+  OPENAL_VERSION: 1.21.0 # This needs to be updated to match the OpenAL version being compiled.
 
 jobs:
   prepare:
@@ -44,7 +44,7 @@ jobs:
     strategy:
       matrix:
         platform:
-          - { name: win-x64, os: ubuntu-latest, toolchain: x86_64-w64-mingw32 }
+          - { name: win-x64, os: windows-latest, shell: pwsh }
       fail-fast: false
       
     steps:
@@ -54,46 +54,64 @@ jobs:
           repository: kcat/openal-soft
           ref: ${{ env.OPENAL_VERSION }}
 
-      - name: Install dependencies (Windows)
-        if: matrix.platform.name == 'win-x64'
-        run: |
-          sudo apt update
-          sudo apt install -y cmake make ninja-build g++-mingw-w64-x86-64-posix
-          sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
-          sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+      # - name: Install dependencies (Windows)
+      #   if: matrix.platform.name == 'win-x64'
+      #   run: |
+      #     sudo apt update
+      #     sudo apt install -y cmake make ninja-build g++-mingw-w64-x86-64-posix
+      #     sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+      #     sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
 
       - name: Create temp folder
-        shell: bash
+        shell: ${{ matrix.platform.shell }}
         run: mkdir ${{ env.BUILD_DIR }}
 
-      - name: Configure OpenAL (Windows)
+      - name: Configure
         if: matrix.platform.name == 'win-x64'
-        shell: bash
-        run: cmake -S . -B "${{ env.BUILD_DIR }}/" \
-          -DCMAKE_SYSTEM_NAME=Windows \
-          -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
-          -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
-          -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
-          -DCMAKE_CXX_STANDARD=17 \
-          -DLIBTYPE=SHARED \
-          -DALSOFT_NO_CONFIG_UTIL=ON \
-          -DALSOFT_EXAMPLES=OFF \
-          -DALSOFT_TESTS=OFF \
+        shell: pwsh
+        run: cmake -S . -B $env:BUILD_DIR `
+          -G "Visual Studio 17 2022" `
+          -A x64 `
+          -DLIBTYPE=SHARED `
+          -DALSOFT_NO_CONFIG_UTIL=ON `
+          -DALSOFT_EXAMPLES=OFF `
+          -DALSOFT_TESTS=OFF `
           -DBUILD_TESTING=OFF
 
+      # - name: Configure OpenAL (Windows)
+      #   if: matrix.platform.name == 'win-x64'
+      #   shell: bash
+      #   run: cmake -S . -B "${{ env.BUILD_DIR }}/" \
+      #     -DCMAKE_SYSTEM_NAME=Windows \
+      #     -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
+      #     -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
+      #     -DCMAKE_RC_COMPILER=${{ matrix.platform.toolchain }}-windres \
+      #     -DCMAKE_CXX_STANDARD=17 \
+      #     -DLIBTYPE=SHARED \
+      #     -DALSOFT_NO_CONFIG_UTIL=ON \
+      #     -DALSOFT_EXAMPLES=OFF \
+      #     -DALSOFT_TESTS=OFF \
+      #     -DBUILD_TESTING=OFF
+
       - name: Build
-        shell: bash
-        run: cmake --build "${{ env.BUILD_DIR }}/" --parallel
+        shell: ${{ matrix.platform.shell }}
+        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
 
       - name: Install
-        shell: bash
+        shell: ${{ matrix.platform.shell }}
         run: cmake --install "${{ env.BUILD_DIR }}/" --prefix "$GITHUB_WORKSPACE/out"
 
-      - name: Upload artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "build-${{ matrix.platform.name }}"
+          path: "${{ env.BUILD_DIR }}/"
+
+      - name: Upload output artifacts
         uses: actions/upload-artifact@v4
         with:
           name: "native-${{ matrix.platform.name }}"
-          path: "${{ env.BUILD_DIR }}/"
+          path: "$GITHUB_WORKSPACE/out/"
   
   package:
     runs-on: windows-latest
