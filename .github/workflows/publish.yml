@@ -59,7 +59,7 @@ jobs:
         run: mkdir ${{ env.BUILD_DIR }}
 
       - name: Configure
-        if: matrix.platform.runner == 'windows'
+        if: matrix.platform.name == 'win-x64'
         shell: bash
         run: cmake -S . -B "${{ env.BUILD_DIR }}" \
           -G "Visual Studio 17 2022" \
@@ -67,13 +67,15 @@ jobs:
           -DLIBTYPE=SHARED \
           -DALSOFT_NO_CONFIG_UTIL=ON \
           -DALSOFT_UTILS=OFF \
+          -DALSOFT_UTILS_SHARED=OFF \
+          -DALSOFT_UTILS_STATIC=OFF \
           -DALSOFT_EXAMPLES=OFF \
           -DALSOFT_TESTS=OFF \
           -DBUILD_TESTING=OFF
 
       - name: Build
         shell: bash
-        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --parallel
+        run: cmake --build "${{ env.BUILD_DIR }}/" --config Release --target install --parallel
 
       - name: Install
         shell: bash
