@@ -38,6 +38,9 @@ jobs:
     runs-on: ${{ matrix.platform.os }}
     needs: prepare
 
+    env:
+      BUILD_DIR: temp
+
     strategy:
       matrix:
         platform:
@@ -59,12 +62,12 @@ jobs:
 
       - name: Create temp folder
         shell: bash
-        run: mkdir temp
+        run: mkdir ${{ env.BUILD_DIR }}
 
       - name: Configure OpenAL (Windows)
         if: matrix.platform.name == 'win-x64'
         shell: bash
-        run: cmake -S . -B "temp/" \
+        run: cmake -S . -B "${{ env.BUILD_DIR }}/" \
           -DCMAKE_SYSTEM_NAME=Windows \
           -DCMAKE_C_COMPILER=${{ matrix.platform.toolchain }}-gcc \
           -DCMAKE_CXX_COMPILER=${{ matrix.platform.toolchain }}-g++ \
@@ -78,13 +81,13 @@ jobs:
 
       - name: Build and Install
         shell: bash
-        run: cmake --build "temp/" --target install --parallel
+        run: cmake --build "${{ env.BUILD_DIR }}/" --target install --parallel
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: "native-${{ matrix.platform.name }}"
-          path: "out/"
+          path: "${{ env.BUILD_DIR }}/"
   
   package:
     runs-on: windows-latest
