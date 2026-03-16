@@ -1,10 +1,11 @@
 name: publish
 
 on:
+  pull_request:
+    types: [opened, reopened, synchronize]
   push:
-    branches-ignore: [ main ]
-    paths:
-      - '.github/workflows/publish.yml'
+    branches:
+      - main
   release:
     types: [ published ]
 
@@ -31,7 +32,7 @@ jobs:
         run: echo "version_number=${{ env.OPENAL_VERSION }}" >> $GITHUB_OUTPUT
 
       - name: Set version suffix
-        if: github.event.action != 'published'
+        if: github.event_name != 'release'
         id: set_version_suffix
         shell: bash
         run: echo "version_suffix=preview.${{ github.run_number }}" >> $GITHUB_OUTPUT
@@ -120,12 +121,12 @@ jobs:
           nuget-version: latest
 
       - name: Package preview
-        if: github.event.action != 'published'
+        if: github.event_name != 'release'
         shell: pwsh
         run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "${{ needs.prepare.outputs.version_suffix }}"
 
       - name: Package release
-        if: github.event.action == 'published'
+        if: github.event_name == 'release'
         shell: pwsh
         run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}"
 
@@ -136,6 +137,7 @@ jobs:
           path: ./out/*.nupkg
 
   publish:
+    if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
     runs-on: windows-latest
     needs: package
 
