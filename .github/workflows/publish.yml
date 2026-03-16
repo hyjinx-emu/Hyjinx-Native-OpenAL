@@ -181,7 +181,7 @@ jobs:
         with:
           tag: ${{ needs.prepare.outputs.full_version }}
           artifacts: "dist/*.*"
-          prerelease: ${{ github.event.action != 'published' }}
-          generateReleaseNotes: ${{ github.event.action != 'published' }}
+          prerelease: ${{ github.event_name != 'release' }}
+          generateReleaseNotes: ${{ github.event_name != 'release' }}
           allowUpdates: true
           omitBodyDuringUpdate: true
