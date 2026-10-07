@@ -116,14 +116,8 @@ jobs:
           nuget-version: latest
 
       - name: Package preview
-        if: github.event_name != 'release'
         shell: pwsh
         run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}" -Suffix "${{ needs.prepare.outputs.version_suffix }}"
-
-      - name: Package release
-        if: github.event_name == 'release'
-        shell: pwsh
-        run: nuget pack Hyjinx.OpenAL.native.nuspec -OutputDirectory ./out -Version "${{ needs.prepare.outputs.version_number }}"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
