@@ -70,7 +70,8 @@ jobs:
           -DALSOFT_UTILS_STATIC=OFF \
           -DALSOFT_EXAMPLES=OFF \
           -DALSOFT_TESTS=OFF \
-          -DBUILD_TESTING=OFF
+          -DBUILD_TESTING=OFF \
+          -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
       - name: Build
         shell: bash
