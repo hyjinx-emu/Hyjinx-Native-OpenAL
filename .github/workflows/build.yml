@@ -59,6 +59,8 @@ jobs:
       - name: Configure
         if: matrix.platform.name == 'win-x64'
         shell: bash
+        env:
+          CMAKE_POLICY_VERSION_MINIMUM: "3.5"
         run: cmake -S . -B "${{ env.BUILD_DIR }}" \
           -G "Visual Studio 17 2022" \
           -A x64 \
@@ -69,8 +71,7 @@ jobs:
           -DALSOFT_UTILS_STATIC=OFF \
           -DALSOFT_EXAMPLES=OFF \
           -DALSOFT_TESTS=OFF \
-          -DBUILD_TESTING=OFF \
-          -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          -DBUILD_TESTING=OFF
 
       - name: Build
         shell: bash
