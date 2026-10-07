@@ -4,11 +4,9 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
   push:
-    branches:
-      - main
 
 env:
-  OPENAL_VERSION: 1.21.0 # This needs to be updated to match the OpenAL version being compiled.
+  OPENAL_VERSION: 1.21.1 # This needs to be updated to match the OpenAL version being compiled.
 
 jobs:
   prepare:
